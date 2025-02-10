@@ -15,4 +15,9 @@ spec:
           containers:
             - name: harbor-cleaner
               image: harbor.warnerchen.com/library/harbor-cleaner:latest
+              envFrom:
+                - configMapRef:
+                    name: harbor-cleaner
+                - secretRef:
+                    name: harbor-cleaner
           restartPolicy: OnFailure

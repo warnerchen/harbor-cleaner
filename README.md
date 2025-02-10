@@ -39,11 +39,18 @@ go build -o harbor-cleaner main.go
 
 ```bash
 docker build -t <registry>/library/harbor-cleaner:latest . -f deploy/Dockerfile
+docker push <registry>/library/harbor-cleaner:latest
 ```
 
 2. **Deploy**:
 
 ```bash
+# Replace the values in deploy/configmap.yaml with your own values.
+kubectl apply -f deploy/configmap.yaml
+
+# Replace the values in deploy/secret.yaml with your own values.
+kubectl apply -f deploy/secret.yaml
+
 # Replace the image in deploy/cronjob.yaml with your image name.
 kubectl apply -f deploy/cronjob.yaml
 ```

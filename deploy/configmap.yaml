@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+  HARBOR_PROJECTS: rancher
+  HARBOR_REGISTRY: https://harbor.warnerchen.com
+  HARBOR_TAGS: rc,test,patch,hotfix,alpha,sha256
+  HARBOR_USERNAME: harbor-cleaner
+kind: ConfigMap
+metadata:
+  creationTimestamp: '2025-02-10T07:52:20Z'
+  name: harbor-cleaner
+  namespace: default
