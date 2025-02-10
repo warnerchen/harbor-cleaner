@@ -6,6 +6,5 @@ data:
   HARBOR_USERNAME: harbor-cleaner
 kind: ConfigMap
 metadata:
-  creationTimestamp: '2025-02-10T07:52:20Z'
   name: harbor-cleaner
   namespace: default
