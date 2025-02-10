@@ -10,6 +10,7 @@ import (
     "strings"
     "time"
     "io"
+    "bytes"
 )
 
 // Repository defines the structure of a repository object
@@ -139,6 +140,7 @@ func cleanTag(registryURL, registryUsername, registryPassword, project, reposito
 
     digestMap := make(map[string][]string)
 
+    // This will retrieve all artifacts under each repository and then delete the tags under the artifacts that meet the specified conditions.
     for _, artifact := range artifacts {
         allTagsExcluded := true
 
@@ -210,6 +212,50 @@ func cleanTag(registryURL, registryUsername, registryPassword, project, reposito
     }
 }
 
+func execGC(registryURL, registryUsername, registryPassword string) {
+    execGCURL := registryURL + "/api/v2.0/system/gc/schedule"
+    jsonData := `{
+        "parameters": {
+            "delete_untagged": true,
+            "workers": 1,
+            "dry_run": false
+        },
+        "schedule": {
+            "type": "Manual"
+        }
+    }`
+
+    transport := &http.Transport{
+        TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+    }
+    client := &http.Client{
+        Transport: transport,
+        Timeout:   10 * time.Second,
+    }
+
+    req, err := http.NewRequest("POST", execGCURL, bytes.NewBuffer([]byte(jsonData)))
+    if err != nil {
+        log.Fatalf("Error creating request: %v", err)
+    }
+
+    req.Header.Add("accept", "application/json")
+    req.Header.Add("Content-Type", "application/json")
+    req.SetBasicAuth(registryUsername, registryPassword)
+
+    resp, err := client.Do(req)
+    if err != nil {
+        log.Fatalf("Error sending request: %v", err)
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode == http.StatusCreated {
+        log.Printf("Garbage collection executed successfully.")
+    } else {
+        log.Printf("Failed to execute garbage collection, status code: %d", resp.StatusCode)
+    }
+    
+}
+
 func main() {
     registryURL := os.Getenv("HARBOR_REGISTRY")
     registryUsername := os.Getenv("HARBOR_USERNAME")
@@ -237,4 +283,9 @@ func main() {
             log.Printf("Project '%s' does not exist or failed to retrieve. Skipping...", project)
         }
     }
+
+    // Since there might be artifacts with empty tags after the cleanup, a garbage collection (GC) is performed to delete them.
+    execGC(registryURL, registryUsername, registryPassword)
+    log.Printf("Done.")
+
 }

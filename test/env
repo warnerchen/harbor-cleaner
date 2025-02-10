@@ -1,5 +1,0 @@
-export HARBOR_REGISTRY=https://harbor.warnerchen.com
-export HARBOR_USERNAME=harbor-cleaner
-export HARBOR_PASSWORD=xxxxxx
-export HARBOR_PROJECTS=library,rancher
-export HARBOR_TAGS=rc,test,patch,hotfix,alpha,sha256
